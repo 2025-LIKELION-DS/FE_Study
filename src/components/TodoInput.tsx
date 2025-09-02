@@ -1,6 +1,5 @@
 import { useState } from "react";
-
-type AddTodo = (todo: string) => void;
+import type { AddTodo } from "../types/todo.types";
 
 export default function TodoInput({ addTodo }: { addTodo: AddTodo }) {
   const [todo, setTodo] = useState<string>("");
