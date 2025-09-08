@@ -4,7 +4,7 @@ import type { AddTodo } from "../types/todo.types";
 export default function TodoInput({ addTodo }: { addTodo: AddTodo }) {
   const [todo, setTodo] = useState<string>("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (todo.trim()) {
       addTodo(todo);
@@ -12,12 +12,15 @@ export default function TodoInput({ addTodo }: { addTodo: AddTodo }) {
     }
   };
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setTodo(e.target.value);
+
   return (
     <form className='todo-container__form' onSubmit={handleSubmit}>
       <input
         type='text'
         value={todo}
-        onChange={(e) => setTodo(e.target.value)}
+        onChange={handleChange}
         className='todo-container__input'
         placeholder='할 일을 입력해보세요!'
       />
