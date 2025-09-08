@@ -7,6 +7,7 @@ import type { Todo } from "./types/todo.types";
 function App() {
   // 전역에서 모든 todo 관련 함수를 만들고 prop으로 각 컴포넌트에 뿌리기
 
+  // TS는 useState 빈 배열이면 never로 추론 -> 제네릭 필요
   const [todos, setTodos] = useState<Todo[]>([]);
 
   const addTodo = useCallback((todo: string) => {
