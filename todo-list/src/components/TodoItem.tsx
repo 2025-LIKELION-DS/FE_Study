@@ -8,23 +8,23 @@ interface TodoItemProps {
     onDelete: (id: number) => void;
 }
 
-const TodoItem: React.FC<TodoItemProps> = ({ id, text, completed, onToggle, onDelete }) => {
+const TodoItem = ({ id, text, completed, onToggle, onDelete }: TodoItemProps) => {
     return (
         <li className="render-container__item">
             <span className="render-container__item-text">{text}</span>
             {!completed ? (
                 <button
-                className="render-container__item-button complete"
-                onClick={() => onToggle(id)}
+                    className="render-container__item-button complete"
+                    onClick={() => onToggle(id)}
                 >
-                완료
+                    완료
                 </button>
             ) : (
                 <button
-                className="render-container__item-button delete"
-                onClick={() => onDelete(id)}
+                    className="render-container__item-button delete"
+                    onClick={() => onDelete(id)}
                 >
-                삭제
+                    삭제
                 </button>
             )}
         </li>

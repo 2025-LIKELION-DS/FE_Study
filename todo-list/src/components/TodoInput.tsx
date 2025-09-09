@@ -5,7 +5,7 @@ interface TodoInputProps {
     onAdd: (text: string) => void;
 }
 
-const TodoInput: React.FC<TodoInputProps> = ({ onAdd }) => {
+const TodoInput = ({ onAdd }: TodoInputProps) => {
     const [input, setInput] = useState("");
 
     const handleAdd = () => {

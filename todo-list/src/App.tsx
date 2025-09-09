@@ -9,7 +9,7 @@ interface Todo {
   completed: boolean;
 }
 
-function App() {
+const App = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
 
   // Todo 추가
@@ -35,12 +35,12 @@ function App() {
   return (
     <div className="App">
       <div className="todo-container">
-      
         <h1 className="todo-container__header">🦁 LIKELION TODO</h1>
+
         {/* Todo 입력 폼 */}
         <TodoInput onAdd={addTodo} />
 
-        {/* 할 일 목록 */}
+        {/* 할 일 / 완료 목록 */}
         <div className="render-container">
           <TodoList
             title="할 일"
@@ -58,6 +58,6 @@ function App() {
       </div>
     </div>
   );
-}
+};
 
 export default App;
