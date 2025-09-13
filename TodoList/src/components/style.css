@@ -1,0 +1,135 @@
+/* ===== 기본 스타일 ===== */
+body {
+    font-family: "Arial", sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(135deg, #fff2e6, #ffe0cc);
+    margin: 0;
+  }
+  
+  /* ===== Todo 컨테이너 ===== */
+  .todo-container {
+    background: white;
+    padding: 20px 24px;
+    border-radius: 16px;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+    width: fit-content;
+    text-align: center;
+    border: 3px solid #ff6b00;
+  }
+  
+  /* ===== 제목 ===== */
+  .todo-container__header {
+    font-size: 26px;
+    margin-bottom: 20px;
+    color: #ff6b00;
+    font-weight: 800;
+  }
+  
+  /* ===== 입력 폼 ===== */
+  .todo-container__form {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .todo-container__input {
+    flex: 1;
+    padding: 10px;
+    border: 2px solid #ff914d;
+    border-radius: 8px;
+    font-size: 14px;
+  }
+  
+  .todo-container__button {
+    background-color: #ff6b00;
+    color: white;
+    border: none;
+    padding: 10px 14px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: transform 0.2s ease, background-color 0.3s ease;
+  }
+  
+  .todo-container__button:hover {
+    background-color: #e55d00;
+    transform: scale(1.05);
+  }
+  
+  /* ===== 리스트 컨테이너 ===== */
+  .render-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  
+  .render-container__section {
+    width: 100%;
+    text-align: center;
+  }
+  
+  .render-container__title {
+    font-size: 18px;
+    margin-bottom: 12px;
+    font-weight: bold;
+    color: #ff6b00;
+  }
+  
+  /* ===== 리스트 ===== */
+  .render-container__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  /* ===== 리스트 아이템 ===== */
+  .render-container__item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    background: #fff7f0;
+    border-radius: 10px;
+    margin-bottom: 8px;
+  }
+  
+  .render-container__item-text {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 14px;
+  }
+  
+  /* ===== 버튼 ===== */
+  .render-container__item-button {
+    color: white;
+    border: none;
+    padding: 6px 10px;
+    cursor: pointer;
+    border-radius: 6px;
+    font-size: 12px;
+    transition: transform 0.2s ease, background-color 0.3s ease;
+  }
+  
+  .render-container__item-button.complete {
+    background-color: #ff6b00;
+  }
+  
+  .render-container__item-button.complete:hover {
+    background-color: #e55d00;
+    transform: scale(1.05);
+  }
+  
+  .render-container__item-button.delete {
+    background-color: #555;
+  }
+  
+  .render-container__item-button.delete:hover {
+    background-color: #333;
+    transform: scale(1.05);
+  }
