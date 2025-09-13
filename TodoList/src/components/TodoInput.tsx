@@ -36,7 +36,8 @@ const TodoInput = ({TODOs,setTODOs}: props) => {
 
     return (
         <form className="todo-container__form" onSubmit={Submit}>
-        <input className="todo-container__input" type="text" placeholder="할일을 입력해보세요!" value={input} onChange={(e) => setInput(e.target.value)}/>
+        <input className="todo-container__input" type="text" placeholder="할일을 입력해보세요!" 
+        value={input} onChange={(e) => setInput(e.target.value)}/>
         <button className="todo-container__button" type='submit'>추가</button>
     </form>
     );
