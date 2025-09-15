@@ -9,8 +9,8 @@ export default function TodoInput({ onAdd }: TodoInputProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (text.trim() === "") return;
-    onAdd(text);
+    if (!text.trim()) return;
+    onAdd(text.trim());
     setText("");
   };
 

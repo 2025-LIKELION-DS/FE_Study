@@ -1,27 +1,26 @@
 import React from "react";
+import { Todo } from "../api/todos";
 
 interface TodoItemProps {
-  text: string;
-  index: number;
+  todo: Todo;
   isCompleted: boolean;
-  onComplete?: (index: number) => void;
-  onDelete?: (index: number) => void;
+  onComplete?: (id: number, completed: boolean) => void;
+  onDelete?: (id: number) => void;
 }
 
 export default function TodoItem({
-  text,
-  index,
+  todo,
   isCompleted,
   onComplete,
   onDelete,
 }: TodoItemProps) {
   return (
     <li className="render-container__item">
-      <span className="render-container__item-text">{text}</span>
+      <span className="render-container__item-text">{todo.title}</span>
       {!isCompleted && onComplete && (
         <button
           className="render-container__item-button complete"
-          onClick={() => onComplete(index)}
+          onClick={() => onComplete(todo.id, true)}
         >
           완료
         </button>
@@ -29,7 +28,7 @@ export default function TodoItem({
       {isCompleted && onDelete && (
         <button
           className="render-container__item-button delete"
-          onClick={() => onDelete(index)}
+          onClick={() => onDelete(todo.id)}
         >
           삭제
         </button>
