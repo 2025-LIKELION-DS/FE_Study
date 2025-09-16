@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import "./style.css";
 import TodoInput from "./components/TodoInput";
 import TodoList from "./components/TodoList";
@@ -7,6 +7,7 @@ import {
   QueryClientProvider,
   useQuery,
   useMutation,
+  useQueryClient,
 } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { fetchTodos, addTodo, deleteTodo, toggleTodo, Todo } from "./api/todos";
@@ -14,6 +15,8 @@ import { fetchTodos, addTodo, deleteTodo, toggleTodo, Todo } from "./api/todos";
 const queryClient = new QueryClient();
 
 function TodoApp() {
+  const queryClient = useQueryClient();
+
   const {
     data: todos = [],
     isLoading,
@@ -23,48 +26,77 @@ function TodoApp() {
     queryFn: fetchTodos,
   });
 
-  const [localTodos, setLocalTodos] = useState<Todo[]>([]);
-
-  useEffect(() => {
-    if (localTodos.length === 0) {
-      setLocalTodos(todos);
-    }
-    // 무한루프를 방지하기 위해 아래 코드를 찾아 삽입했습니다.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [todos]);
-
-
   const addMutation = useMutation({
     mutationFn: (title: string) => addTodo(title),
-    onSuccess: (newTodo) => {
-      const tempTodo = { ...newTodo, id: Date.now() };
-      setLocalTodos((prev) => [tempTodo, ...prev]);
+    onMutate: async (title) => {
+      await queryClient.cancelQueries({ queryKey: ["todos"] });
+      const prevTodos = queryClient.getQueryData<Todo[]>(["todos"]);
+      const tempTodo: Todo = {
+        userId: 1,
+        id: Date.now(),
+        title,
+        completed: false,
+      };
+      queryClient.setQueryData<Todo[]>(["todos"], (old) =>
+        old ? [tempTodo, ...old] : [tempTodo]
+      );
+      return { prevTodos };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.prevTodos) {
+        queryClient.setQueryData(["todos"], context.prevTodos);
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["todos"] });
     },
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id: number) => deleteTodo(id),
-    onSuccess: (_, id) =>
-      setLocalTodos((prev) => prev.filter((t) => t.id !== id)),
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: ["todos"] });
+      const prevTodos = queryClient.getQueryData<Todo[]>(["todos"]);
+      queryClient.setQueryData<Todo[]>(["todos"], (old) =>
+        old ? old.filter((t) => t.id !== id) : []
+      );
+      return { prevTodos };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.prevTodos) {
+        queryClient.setQueryData(["todos"], context.prevTodos);
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["todos"] });
+    },
   });
 
   const toggleMutation = useMutation({
     mutationFn: ({ id, completed }: { id: number; completed: boolean }) =>
       toggleTodo(id, completed),
-    onSuccess: (updatedTodo) =>
-      setLocalTodos((prev) =>
-        prev.map((t) => (t.id === updatedTodo.id ? updatedTodo : t))
-      ),
+    onMutate: async ({ id, completed }) => {
+      await queryClient.cancelQueries({ queryKey: ["todos"] });
+      const prevTodos = queryClient.getQueryData<Todo[]>(["todos"]);
+      queryClient.setQueryData<Todo[]>(["todos"], (old) =>
+        old ? old.map((t) => (t.id === id ? { ...t, completed } : t)) : []
+      );
+      return { prevTodos };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.prevTodos) {
+        queryClient.setQueryData(["todos"], context.prevTodos);
+      }
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["todos"] });
+    },
   });
 
   const handleAdd = (text: string) => addMutation.mutate(text);
   const handleDelete = (id: number) => deleteMutation.mutate(id);
-  const handleComplete = (id: number, completed: boolean) => {
-    setLocalTodos((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, completed } : t))
-    );
+  const handleComplete = (id: number, completed: boolean) =>
     toggleMutation.mutate({ id, completed });
-  };
 
   if (isLoading) return <p>Loading...</p>;
   if (isError) return <p>에러 발생!</p>;
@@ -76,13 +108,13 @@ function TodoApp() {
       <div className="render-container">
         <TodoList
           title="할 일"
-          items={localTodos.filter((t) => !t.completed)}
+          items={todos.filter((t) => !t.completed)}
           onComplete={handleComplete}
           isCompleted={false}
         />
         <TodoList
           title="완료"
-          items={localTodos.filter((t) => t.completed)}
+          items={todos.filter((t) => t.completed)}
           onDelete={handleDelete}
           isCompleted={true}
         />
