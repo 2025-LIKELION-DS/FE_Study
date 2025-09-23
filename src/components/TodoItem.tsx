@@ -22,8 +22,8 @@ function TodoItem({
 
   return (
     <div className='render-container__item'>
-      <div className='render-container__item-text'>{todo.todo}</div>
-      {todo.done ? (
+      <div className='render-container__item-text'>{todo.title}</div>
+      {todo.completed ? (
         // 완료된 투두 === "완료" 목록에 들어가며, 삭제 버튼만 뜸
         <button
           className='render-container__item-button delete'

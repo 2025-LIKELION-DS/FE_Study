@@ -13,10 +13,10 @@ export default function TodoList({
 }) {
   // done 상태에 따라 Todo 배열 나눔
   const onTodos: Todos = useMemo(() => {
-    return todos.filter((t) => t.done === false);
+    return todos.filter((t) => t.completed === false);
   }, [todos]);
   const doneTodos: Todos = useMemo(() => {
-    return todos.filter((t) => t.done === true);
+    return todos.filter((t) => t.completed === true);
   }, [todos]);
 
   return (
