@@ -1,4 +1,9 @@
-export type Todo = { id: number; todo: string; done: boolean };
+export type Todo = {
+  userId: number;
+  id: number;
+  title: string;
+  completed: boolean;
+};
 
 export type Todos = Todo[];
 
