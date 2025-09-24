@@ -3,8 +3,12 @@ import TodoInput from "./component/TodoInput";
 import TodoList from "./component/TodoList";
 import { Todo } from "./types";
 import "./style.css";
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
+const queryClient = new QueryClient(); // QueryClient 생성
 const App: React.FC = () => {
+
   const [todos, setTodos] = useState<Todo[]>([]);
 
   const addTodo = (text: string) => {
@@ -32,6 +36,11 @@ const App: React.FC = () => {
   const completedTodos = todos.filter((todo) => todo.isCompleted);
 
   return (
+  <QueryClientProvider client={queryClient}>
+      {/* 애플리케이션 컴포넌트 페이지 컴포넌트 등등 */}
+      {/* {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />} */} {/* vite에서 사용 */}
+      {process.env.NODE_ENV === 'development' && <ReactQueryDevtools initialIsOpen={false} />} {/* CRA 환경에서 사용 */}
+    
     <div className="todo-container">
       <h1 className="todo-container__header">😻 To-Do List 📒</h1>
       <TodoInput onAdd={addTodo} />
@@ -50,5 +59,7 @@ const App: React.FC = () => {
         />
       </div>
     </div>
+    </QueryClientProvider>
   );
 };
+export default App;
