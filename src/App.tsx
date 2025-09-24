@@ -1,53 +1,78 @@
 // src/App.tsx
-import React, { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { getTodos, addTodo, updateTodo, deleteTodo } from './api/todos';
 import TodoInput from './components/TodoInput';
 import TodoList from './components/TodoList';
-import type { Todo } from './types';
-import './style.css'; // 새로 만든 css 파일을 import
+import './style.css';
 
 const App: React.FC = () => {
-  const [todos, setTodos] = useState<Todo[]>([]);
+  const queryClient = useQueryClient();
 
-  const addTodo = (text: string) => {
-    const newTodo: Todo = {
-      id: Date.now(),
-      text: text,
-      isDone: false,
-    };
-    setTodos([...todos, newTodo]);
+  // GET (useQuery)
+  const { data: todos, isLoading, isError } = useQuery({
+    queryKey: ['todos'],
+    queryFn: getTodos,
+  });
+
+  // POST (useMutation)
+  const addMutation = useMutation({
+    mutationFn: addTodo,
+    onSuccess: () => {
+     
+      queryClient.invalidateQueries({ queryKey: ['todos'] });
+    },
+  });
+
+
+  const updateMutation = useMutation({
+    mutationFn: updateTodo,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['todos'] });
+    },
+  });
+
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteTodo,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['todos'] });
+    },
+  });
+
+  const handleAddTodo = (title: string) => {
+    addMutation.mutate({ title, completed: false, userId: 1 });
   };
 
-  const toggleTodo = (id: number) => {
-    setTodos(
-      todos.map((todo) =>
-        todo.id === id ? { ...todo, isDone: !todo.isDone } : todo
-      )
-    );
+  const handleToggleTodo = (todo: Todo) => {
+    updateMutation.mutate({ ...todo, completed: !todo.completed });
   };
 
-  const deleteTodo = (id: number) => {
-    setTodos(todos.filter((todo) => todo.id !== id));
+  const handleDeleteTodo = (id: number) => {
+    deleteMutation.mutate(id);
   };
 
-  const workingTodos = todos.filter((todo) => !todo.isDone);
-  const doneTodos = todos.filter((todo) => todo.isDone);
+  if (isLoading) return <div>로딩 중...</div>;
+  if (isError) return <div>에러가 발생했습니다.</div>;
+
+  const workingTodos = todos?.filter((todo) => !todo.completed) || [];
+  const doneTodos = todos?.filter((todo) => todo.completed) || [];
 
   return (
     <div className="todo-container">
-      <h1 className="todo-container__header">🦁 LIKELION To-Do</h1>
-      <TodoInput onAdd={addTodo} />
+      <h1 className="todo-container__header">🦁 LIKELION TO-DO </h1>
+      <TodoInput onAdd={handleAddTodo} />
       <div className="render-container">
         <TodoList
-          title="해야 할 일 🔥"
+          title="할 일 🔥"
           todos={workingTodos}
-          onToggle={toggleTodo}
-          onDelete={deleteTodo}
+          onToggle={handleToggleTodo}
+          onDelete={handleDeleteTodo}
         />
         <TodoList
-          title="완료한 일 ✅"
+          title="완료 ✅" 
           todos={doneTodos}
-          onToggle={toggleTodo}
-          onDelete={deleteTodo}
+          onToggle={handleToggleTodo}
+          onDelete={handleDeleteTodo}
         />
       </div>
     </div>
