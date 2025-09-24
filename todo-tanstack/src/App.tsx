@@ -1,71 +1,35 @@
-import { useState } from "react";
-import TodoInput from "./components/TodoInput";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "./api/client";
 import TodoList from "./components/TodoList";
-import "./style.css";
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import TodoInput from "./components/TodoInput";
+import type { Todo } from "./types/todo";
 
-const queryClient = new QueryClient(); // QueryClient 생성
-
-interface Todo {
-  id: number;
-  text: string;
-  completed: boolean;
-}
-
-
-const App = () => {
-  const [todos, setTodos] = useState<Todo[]>([]);
-
-  // Todo 추가
-  const addTodo = (text: string) => {
-    const newTodo: Todo = { id: Date.now(), text, completed: false };
-    setTodos([...todos, newTodo]);
-  };
-
-  // 완료 상태 토글
-  const toggleComplete = (id: number) => {
-    setTodos(
-      todos.map((todo) =>
-        todo.id === id ? { ...todo, completed: !todo.completed } : todo
-      )
-    );
-  };
-
-  // Todo 삭제
-  const deleteTodo = (id: number) => {
-    setTodos(todos.filter((todo) => todo.id !== id));
-  };
-
-  return (
-    <QueryClientProvider client={queryClient}>
-      <div className="App">
-        <div className="todo-container">
-          <h1 className="todo-container__header">🦁 LIKELION TODO</h1>
-
-          {/* Todo 입력 폼 */}
-          <TodoInput onAdd={addTodo} />
-
-          {/* 할 일 / 완료 목록 */}
-          <div className="render-container">
-            <TodoList
-              title="할 일"
-              items={todos.filter((todo) => !todo.completed)}
-              onToggle={toggleComplete}
-              onDelete={deleteTodo}
-            />
-            <TodoList
-              title="완료"
-              items={todos.filter((todo) => todo.completed)}
-              onToggle={toggleComplete}
-              onDelete={deleteTodo}
-            />
-          </div>
-        </div>
-      </div>
-      {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
-    </QueryClientProvider>
-  );
+const fetchTodos = async (): Promise<Todo[]> => {
+  const { data } = await api.get("/todos");
+  return data.slice(0, 10); 
 };
 
-export default App;
+export default function App() {
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["todos"],
+    queryFn: fetchTodos,
+  });
+
+  if (isLoading) return <p>로딩 중...</p>;
+  if (isError) return <p>에러 발생!</p>;
+
+  const todos = data ?? [];
+  const pending = todos.filter((t) => !t.completed);
+  const done = todos.filter((t) => t.completed);
+
+  return (
+    <div className="todo-container">
+      <h1 className="todo-container__header">🦁 LIKELION TODO</h1>
+      <TodoInput />
+      <div className="render-container">
+        <TodoList title="할 일" items={pending} />
+        <TodoList title="완료" items={done} />
+      </div>
+    </div>
+  );
+}
