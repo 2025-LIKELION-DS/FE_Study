@@ -15,12 +15,12 @@ async function fetchTodos() {
 }
 
 // POST /todos
+// POST 할 때 id는 자동으로 할당됨
 async function addTodoFn(todo: string): Promise<Todo> {
   const res = await fetch("https://jsonplaceholder.typicode.com/todos/", {
     method: "POST",
     body: JSON.stringify({
-      userId: 0,
-      id: Date.now(),
+      userId: 1,
       title: todo,
       completed: false,
     }),
@@ -57,27 +57,28 @@ async function deleteTodoFn(id: number): Promise<void> {
 
 function App() {
   // todo 목록 불러오기
-  const { data: todos } = useQuery<Todos>({
+  const { data: todos } = useQuery<Todos, Error>({
     queryKey: ["todos"],
     queryFn: fetchTodos,
   });
 
   // useMutation 함수들
-  const addTodoMutation = useMutation({
+  // 제네릭은 반환값 타입, 에러 타입, 매개변수 타입 순서
+  const addTodoMutation = useMutation<Todo, Error, string>({
     mutationFn: addTodoFn,
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["todos"] });
     },
   });
 
-  const completeTodoMutation = useMutation({
+  const completeTodoMutation = useMutation<Todo, Error, number>({
     mutationFn: completeTodoFn,
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["todos"] });
     },
   });
 
-  const deleteTodoMutation = useMutation({
+  const deleteTodoMutation = useMutation<void, Error, number>({
     mutationFn: deleteTodoFn,
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["todos"] });
