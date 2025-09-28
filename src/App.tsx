@@ -6,9 +6,11 @@ import "./styles/style.css";
 import type { Todo, Todos } from "./types/todo.types";
 import { qc } from "./main";
 
+const BASE_URL = "https://jsonplaceholder.typicode.com/todos/";
+
 // GET /todos
 async function fetchTodos() {
-  const res = await fetch("https://jsonplaceholder.typicode.com/todos/");
+  const res = await fetch(BASE_URL);
   if (!res.ok) throw new Error("할 일을 불러오지 못했습니다.");
   const data: Todos = await res.json();
   return data.slice(0, 10);
@@ -17,7 +19,7 @@ async function fetchTodos() {
 // POST /todos
 // POST 할 때 id는 자동으로 할당됨
 async function addTodoFn(todo: string): Promise<Todo> {
-  const res = await fetch("https://jsonplaceholder.typicode.com/todos/", {
+  const res = await fetch(BASE_URL, {
     method: "POST",
     body: JSON.stringify({
       userId: 1,
@@ -34,7 +36,7 @@ async function addTodoFn(todo: string): Promise<Todo> {
 
 // PATCH /todos/:id
 async function completeTodoFn(id: number): Promise<Todo> {
-  const res = await fetch(`https://jsonplaceholder.typicode.com/todos/${id}`, {
+  const res = await fetch(`${BASE_URL}${id}`, {
     method: "PATCH",
     body: JSON.stringify({
       completed: true,
@@ -49,7 +51,7 @@ async function completeTodoFn(id: number): Promise<Todo> {
 
 // DELETE /todos/:id
 async function deleteTodoFn(id: number): Promise<void> {
-  const res = await fetch(`https://jsonplaceholder.typicode.com/todos/${id}`, {
+  const res = await fetch(`${BASE_URL}${id}`, {
     method: "DELETE",
   });
   if (!res.ok) throw new Error("할 일을 삭제하지 못했습니다.");
