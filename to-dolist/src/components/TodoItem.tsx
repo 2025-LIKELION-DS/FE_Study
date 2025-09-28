@@ -10,7 +10,7 @@ type TodoItemProps = {
 function TodoItem({ item, onComplete, onDelete }: TodoItemProps) {
   return (
     <li className="render-container__item">
-        <span className='render-container__item-text'>{item.text}</span>
+        <span className='render-container__item-text'>{item.title}</span>
         {onComplete && (
             <button className='render-container__item-button complete' onClick={() => onComplete(item.id)}>
             완료
