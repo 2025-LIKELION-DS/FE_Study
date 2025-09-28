@@ -1,46 +1,35 @@
 import TodoItem from "./TodoItem";
-import type { Todo } from "../App";
+import { useTodos } from "../queries/todos";
 
-type DoingProps = {
-  mode: "doing";
-  items: Todo[];
-  onDone: (id: string) => void;
-};
+type Props = { mode: "doing" | "done" };
 
-type DoneProps = {
-  mode: "done";
-  items: Todo[];
-  onDelete: (id: string) => void;
-};
+export default function TodoList({ mode }: Props) {
+  const { data, isLoading, isError } = useTodos();
 
-export default function TodoList(props: DoingProps | DoneProps) {
-  if (!props.items.length) {
-    return <ul className="render-container__list" />;
-  }
+  if (isLoading)
+    return (
+      <ul className="render-container__list">
+        <li>불러오는 중…</li>
+      </ul>
+    );
+  if (isError)
+    return (
+      <ul className="render-container__list">
+        <li>목록을 불러오지 못했습니다.</li>
+      </ul>
+    );
+
+  const items = (data ?? []).filter((t) =>
+    mode === "doing" ? !t.completed : t.completed
+  );
+
+  if (!items.length) return <ul className="render-container__list" />;
 
   return (
     <ul className="render-container__list">
-      {props.items.map((t) => {
-        if (props.mode === "doing") {
-          return (
-            <TodoItem
-              key={t.id}
-              text={t.text}
-              mode="doing"
-              onDone={() => props.onDone(t.id)}
-            />
-          );
-        } else {
-          return (
-            <TodoItem
-              key={t.id}
-              text={t.text}
-              mode="done"
-              onDelete={() => props.onDelete(t.id)}
-            />
-          );
-        }
-      })}
+      {items.map((t) => (
+        <TodoItem key={t.id} todo={t} mode={mode} />
+      ))}
     </ul>
   );
 }

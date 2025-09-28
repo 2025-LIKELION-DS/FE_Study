@@ -1,28 +1,36 @@
-type Props =
-  | { text: string; mode: "doing"; onDone: () => void; onDelete?: never }
-  | { text: string; mode: "done"; onDelete: () => void; onDone?: never };
+import type { Todo } from "../types/todo";
+import { useDeleteTodo, useToggleTodo } from "../queries/todos";
 
-export default function TodoItem(props: Props) {
+type Props = { todo: Todo; mode: "doing" | "done" };
+
+export default function TodoItem({ todo, mode }: Props) {
+  const del = useDeleteTodo();
+  const toggle = useToggleTodo();
+
   return (
     <li className="render-container__item">
-      <span className="render-container__item-text">{props.text}</span>
+      <span className="render-container__item-text">{todo.title}</span>
 
       <div>
-        {props.mode === "doing" && (
+        {mode === "doing" && (
           <button
             className="render-container__item-button complete"
-            onClick={props.onDone}
+            onClick={() =>
+              toggle.mutate({ id: todo.id, completed: !todo.completed })
+            }
+            disabled={toggle.isPending}
           >
-            완료
+            {toggle.isPending ? "처리 중..." : "완료"}
           </button>
         )}
 
-        {props.mode === "done" && (
+        {mode === "done" && (
           <button
             className="render-container__item-button delete"
-            onClick={props.onDelete}
+            onClick={() => del.mutate(todo.id)}
+            disabled={del.isPending}
           >
-            삭제
+            {del.isPending ? "삭제 중..." : "삭제"}
           </button>
         )}
       </div>
