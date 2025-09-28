@@ -1,46 +1,34 @@
-import React, { useState } from 'react';
-import '../components/style.css'; 
+import React, { useState } from "react";
+import { useAddTodo } from "../api/todos";
+import './style.css';
 
-interface TODO {
-    id: number;
-    text: string;
-    completed: boolean;
-}
+export default function TodoInput() {
+  const [text, setText] = useState("");
 
-interface props{
-    TODOs: TODO[];
-    setTODOs: React.Dispatch<React.SetStateAction<TODO[]>>;
-}
+  const addTodoMutation = useAddTodo();
 
-const TodoInput = ({TODOs,setTODOs}: props) => {
-    const [input,setInput] =useState('');
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmedText = text.trim();
+    if (!trimmedText) return;
 
-    const handleAdd = () =>{
-        if(input.trim() === '') return;
+    addTodoMutation.mutate(trimmedText);
 
-        const newTODO: TODO ={
-            id:Date.now(),
-            text:input,
-            completed:false,
+    setText("");
+  };
 
-        };
-        setTODOs([...TODOs, newTODO]);
-       setInput('');
-    };
-
-//추가버튼 누르면
-    const Submit = (e: React.FormEvent)=>{
-        e.preventDefault();
-        handleAdd();
-    };
-
-    return (
-        <form className="todo-container__form" onSubmit={Submit}>
-        <input className="todo-container__input" type="text" placeholder="할일을 입력해보세요!" 
-        value={input} onChange={(e) => setInput(e.target.value)}/>
-        <button className="todo-container__button" type='submit'>추가</button>
+  return (
+    <form onSubmit={handleSubmit} className="todo-container__form">
+      <input
+        type="text"
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        placeholder="할 일을 입력하세요"
+        className="todo-container__input"
+      />
+      <button type="submit" className="todo-container__button">
+        추가
+      </button>
     </form>
-    );
-};
-
-export default TodoInput;
+  );
+}

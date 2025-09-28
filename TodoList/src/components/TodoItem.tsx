@@ -1,26 +1,37 @@
 import React from 'react';
+import { type Todo, useDeleteTodo, useToggleTodo } from "../api/todos";
+import './style.css';
 
-interface TODO {
-  id: number;
-  text: string;
-  completed: boolean;
+interface TodoItemProps {
+  todo: Todo;
 }
 
-interface Props {
-  todo: TODO;
-  Complete: (id: number) => void;
-}
+const TodoItem = ({ todo }: TodoItemProps) => {
+  const deleteMutation = useDeleteTodo();
+  const toggleMutation = useToggleTodo();
 
-const TodoItem = ({ todo, Complete}: Props) => {
+  const complete = () => {
+    toggleMutation.mutate(todo);
+  };
+
+  const deleteTodo = () => {
+    deleteMutation.mutate(todo.id);
+  };
+
   return (
     <div className="render-container__item">
-      <span className='render-container__item-text'>{todo.text}</span>
-      <button
-        className={`render-container__item-button ${todo.completed ?  'delete':'complete' }`}
-        onClick={() => Complete(todo.id)}
+      <span
+        className={`render-container__item-text ${todo.completed ? "completed" : ""}`}
+        onClick={complete}
       >
-        {todo.completed ? '삭제' : '완료'}
-      </button>
+        {todo.title}
+      </span>
+      <button
+  className={`render-container__item-button ${todo.completed ? "deleteTodo" : "complete"}`}
+  onClick={todo.completed ? deleteTodo : complete}
+>
+  {todo.completed ? "삭제" : "완료"}
+</button>
     </div>
   );
 };

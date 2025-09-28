@@ -1,25 +1,21 @@
 import React from 'react';
 import TodoItem from './TodoItem';
-
-interface TODO {
-  id: number;
-  text: string;
-  completed: boolean;
-}
+import { type Todo } from '../api/todos';
+import './style.css';
 
 interface Props {
-  todos: TODO[];
-  Complete: (id: number) => void;
-}
+    todos: Todo[];
+  }
 
-const TodoList = ({ todos, Complete }: Props) => {
-  return (
-    <div className="render-container__list">
-      {todos.map((todo) => (
-        <TodoItem key={todo.id} todo={todo} Complete={Complete} />
-      ))}
-    </div>
-  );
-};
 
+  const TodoList = ({ todos }: Props) => {
+    return (
+      <div className="render-container__list">
+        {todos.map((todo) => (
+          <TodoItem key={todo.id} todo={todo} />
+        ))}
+      </div>
+    );
+  };
+  
 export default TodoList;

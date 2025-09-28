@@ -125,11 +125,11 @@ body {
     transform: scale(1.05);
   }
   
-  .render-container__item-button.delete {
+  .render-container__item-button.deleteTodo {
     background-color: #555;
   }
   
-  .render-container__item-button.delete:hover {
+  .render-container__item-button.deleteTodo:hover {
     background-color: #333;
     transform: scale(1.05);
   }
