@@ -1,0 +1,128 @@
+import { useCallback } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import TodoInput from "./components/TodoInput";
+import TodoList from "./components/TodoList";
+import "./styles/style.css";
+import type { Todo, Todos } from "./types/todo.types";
+import { qc } from "./main";
+
+const BASE_URL = "https://jsonplaceholder.typicode.com/todos/";
+
+// GET /todos
+async function fetchTodos() {
+  const res = await fetch(BASE_URL);
+  if (!res.ok) throw new Error("할 일을 불러오지 못했습니다.");
+  const data: Todos = await res.json();
+  return data.slice(0, 10);
+}
+
+// POST /todos
+// POST 할 때 id는 자동으로 할당됨
+async function addTodoFn(todo: string): Promise<Todo> {
+  const res = await fetch(BASE_URL, {
+    method: "POST",
+    body: JSON.stringify({
+      userId: 1,
+      title: todo,
+      completed: false,
+    }),
+    headers: {
+      "Content-type": "application/json",
+    },
+  });
+  if (!res.ok) throw new Error("할 일을 추가하지 못했습니다.");
+  return res.json();
+}
+
+// PATCH /todos/:id
+async function completeTodoFn(id: number): Promise<Todo> {
+  const res = await fetch(`${BASE_URL}${id}`, {
+    method: "PATCH",
+    body: JSON.stringify({
+      completed: true,
+    }),
+    headers: {
+      "Content-type": "application/json",
+    },
+  });
+  if (!res.ok) throw new Error("할 일을 완료하지 못했습니다.");
+  return res.json();
+}
+
+// DELETE /todos/:id
+async function deleteTodoFn(id: number): Promise<void> {
+  const res = await fetch(`${BASE_URL}${id}`, {
+    method: "DELETE",
+  });
+  if (!res.ok) throw new Error("할 일을 삭제하지 못했습니다.");
+}
+
+function App() {
+  // todo 목록 불러오기
+  const { data: todos } = useQuery<Todos, Error>({
+    queryKey: ["todos"],
+    queryFn: fetchTodos,
+  });
+
+  // useMutation 함수들
+  // 제네릭은 반환값 타입, 에러 타입, 매개변수 타입 순서
+  const addTodoMutation = useMutation<Todo, Error, string>({
+    mutationFn: addTodoFn,
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["todos"] });
+    },
+  });
+
+  const completeTodoMutation = useMutation<Todo, Error, number>({
+    mutationFn: completeTodoFn,
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["todos"] });
+    },
+  });
+
+  const deleteTodoMutation = useMutation<void, Error, number>({
+    mutationFn: deleteTodoFn,
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["todos"] });
+    },
+  });
+
+  const addTodo = useCallback(
+    (todo: string) => {
+      const t = todo.trim();
+      if (!t) return;
+      addTodoMutation.mutate(t);
+    },
+    [addTodoMutation]
+  );
+
+  const completeTodo = useCallback(
+    (id: number) => {
+      completeTodoMutation.mutate(id);
+    },
+    [completeTodoMutation]
+  );
+
+  const deleteTodo = useCallback(
+    (id: number) => {
+      deleteTodoMutation.mutate(id);
+    },
+    [deleteTodoMutation]
+  );
+
+  return (
+    <>
+      <div className='todo-container'>
+        <div className='todo-container__header'>🦁 LIKELION TO-DO</div>
+        <TodoInput addTodo={addTodo} />
+        <TodoList
+          todos={todos || []}
+          completeTodo={completeTodo}
+          deleteTodo={deleteTodo}
+        />
+      </div>
+    </>
+  );
+}
+
+export default App;
